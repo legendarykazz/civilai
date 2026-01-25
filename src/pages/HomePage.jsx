@@ -1,0 +1,133 @@
+import React from 'react';
+import { ArrowRight, Bot, Cpu, Layers, MessageSquare, Globe, ShieldCheck, Sparkles, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+const HomePage = () => {
+    return (
+        <div className="overflow-hidden">
+
+            {/* Hero Section */}
+            <div className="relative isolate min-h-[90vh] flex items-center">
+                {/* Background Image / Gradient */}
+                <div className="absolute inset-0 -z-10">
+                    <div className="absolute inset-0 bg-eng-blue-900/90 dark:bg-eng-blue-950/90 mix-blend-multiply" />
+                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2670&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-overlay grayscale" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-eng-blue-900 via-transparent to-transparent" />
+                </div>
+
+                {/* Glowing Orbs */}
+                <div className="absolute top-0 right-0 -z-10 transform-gpu overflow-hidden blur-3xl" aria-hidden="true">
+                    <div className="relative left-[calc(50%+3rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 bg-gradient-to-tr from-cyan-accent to-eng-blue-600 opacity-30 sm:left-[calc(50%+36rem)] sm:w-[72.1875rem]" style={{ clipPath: 'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)' }} />
+                </div>
+
+                <div className="mx-auto max-w-7xl px-6 lg:px-8 py-32 text-center">
+                    <h1 className="mx-auto max-w-4xl text-5xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-7xl mb-8 animate-in slide-in-from-bottom-5 fade-in duration-800 delay-100">
+                        Engineering Intelligence for <span className="text-transparent bg-clip-text bg-gradient-to-r from-eng-blue-600 to-cyan-accent">Smarter Structures</span>
+                    </h1>
+
+                    <p className="mx-auto max-w-2xl text-lg leading-8 text-slate-800 dark:text-slate-300 mb-12 animate-in slide-in-from-bottom-5 fade-in duration-1000 delay-200">
+                        The world's most advanced AI platform for civil structural analysis. Get real-time design guidance, automate workflows, and solve complex engineering challenges instantly.
+                    </p>
+
+                    <div className="flex items-center justify-center gap-6 animate-in slide-in-from-bottom-5 fade-in duration-1000 delay-300">
+                        <button
+                            onClick={() => document.querySelector('#chat-trigger')?.click()}
+                            className="rounded-full bg-eng-blue-600 hover:bg-eng-blue-500 text-white px-8 py-4 text-base font-semibold shadow-xl shadow-eng-blue-600/30 hover:shadow-cyan-accent/20 hover:-translate-y-1 transition-all"
+                        >
+                            Ask AI Assistant
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Core Engineering Rules & Design Guidance Section (Primary Features Only) */}
+            <div className="py-24 sm:py-32 bg-slate-50 dark:bg-eng-blue-900">
+                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    <div className="mx-auto max-w-2xl lg:text-center mb-16">
+                        <h2 className="text-base font-semibold leading-7 text-eng-blue-600 dark:text-cyan-accent uppercase tracking-wider">Expert Guidance</h2>
+                        <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+                            Core Engineering Rules & Design Guidelines
+                        </p>
+                        <p className="mt-4 text-base text-slate-800 dark:text-slate-400">
+                            Practical rules, common code principles, and frequent steel design mistakes every engineer should know.
+                        </p>
+                    </div>
+
+                    <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-none">
+                        <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-16 lg:max-w-none lg:grid-cols-3">
+                            {/* General Engineering Rules */}
+                            <div className="flex flex-col glass-panel p-8 rounded-3xl hover:bg-white dark:hover:bg-eng-blue-800 transition-colors group">
+                                <dt className="flex items-center gap-x-3 text-base font-bold leading-7 text-slate-900 dark:text-white mb-4">
+                                    <div className="h-10 w-10 flex items-center justify-center rounded-lg bg-eng-blue-600/10 dark:bg-cyan-accent/10 text-eng-blue-600 dark:text-cyan-accent group-hover:scale-110 transition-transform font-bold">
+                                        <ShieldCheck size={24} />
+                                    </div>
+                                    General Rules
+                                </dt>
+                                <dd className="flex flex-auto flex-col text-sm leading-7 text-slate-800 dark:text-slate-400">
+                                    <ul className="space-y-2">
+                                        <li>• Safety factors over theoretical strength</li>
+                                        <li>• Continuous load paths from roof to base</li>
+                                        <li>• No reliance on single critical elements</li>
+                                        <li>• Serviceability equals strength limits</li>
+                                        <li>• Justify every stated assumption</li>
+                                    </ul>
+                                </dd>
+                            </div>
+
+                            {/* BS-Style Code Principles */}
+                            <div className="flex flex-col glass-panel p-8 rounded-3xl hover:bg-white dark:hover:bg-eng-blue-800 transition-colors group">
+                                <dt className="flex items-center gap-x-3 text-base font-bold leading-7 text-slate-900 dark:text-white mb-4">
+                                    <div className="h-10 w-10 flex items-center justify-center rounded-lg bg-eng-blue-600/10 dark:bg-cyan-accent/10 text-eng-blue-600 dark:text-cyan-accent group-hover:scale-110 transition-transform">
+                                        <Cpu size={24} />
+                                    </div>
+                                    Code Principles
+                                </dt>
+                                <dd className="flex flex-auto flex-col text-sm leading-7 text-slate-800 dark:text-slate-400">
+                                    <ul className="space-y-2">
+                                        <li>• Apply partial safety factors to materials</li>
+                                        <li>• Separate dead vs imposed load cases</li>
+                                        <li>• Check Buckling, Deflection, Capacity</li>
+                                        <li>• Stability governs slender members</li>
+                                        <li>• Connections match member reliability</li>
+                                    </ul>
+                                </dd>
+                            </div>
+
+                            {/* Common Steel Errors */}
+                            <div className="flex flex-col glass-panel p-8 rounded-3xl border-red-200/50 dark:border-red-900/40 bg-red-50/20 dark:bg-red-900/10 hover:bg-white dark:hover:bg-red-900/20 transition-colors group">
+                                <dt className="flex items-center gap-x-3 text-base font-bold leading-7 text-red-700 dark:text-red-400 mb-4">
+                                    <div className="h-10 w-10 flex items-center justify-center rounded-lg bg-red-600/10 text-red-600 group-hover:scale-110 transition-transform">
+                                        <X size={24} />
+                                    </div>
+                                    Common Errors
+                                </dt>
+                                <dd className="flex flex-auto flex-col text-sm leading-7 text-slate-900 dark:text-slate-200 font-bold">
+                                    <ul className="space-y-2">
+                                        <li>❌ Ignoring compression buckling</li>
+                                        <li>❌ Under-designed connection details</li>
+                                        <li>❌ Forgetting corrosion allowances</li>
+                                        <li>❌ Incorrect column effective lengths</li>
+                                        <li>❌ Mixing units (kN, N, mm)</li>
+                                    </ul>
+                                </dd>
+                            </div>
+                        </dl>
+                    </div>
+
+                    <div className="mt-20 pt-10 border-t border-slate-200 dark:border-slate-800 text-center">
+                        <div className="inline-flex items-center gap-2 bg-white/50 dark:bg-eng-blue-900 px-6 py-3 rounded-full border border-slate-200 dark:border-slate-700 text-sm mb-8">
+                            <Bot size={18} className="text-eng-blue-600 dark:text-cyan-accent" />
+                            <span className="text-slate-900 dark:text-slate-300 font-bold">AI Assistant Note:</span>
+                            <span className="text-slate-800 dark:text-slate-400">Provides guidance—does not replace professional judgment or official codes.</span>
+                        </div>
+                        <p className="text-sm text-slate-600 dark:text-slate-500 italic">
+                            Engineering is not about guessing — it is about disciplined assumptions, verified calculations, and safe judgment.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default HomePage;

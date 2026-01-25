@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@theme {
+  --color-eng-blue-50: #f0f4f8;
+  --color-eng-blue-100: #d9e2ec;
+  --color-eng-blue-200: #bcccdc;
+  --color-eng-blue-300: #9fb3c8;
+  --color-eng-blue-400: #829ab1;
+  --color-eng-blue-500: #627d98;
+  --color-eng-blue-600: #486581;
+  --color-eng-blue-700: #334e68;
+  --color-eng-blue-800: #243b53;
+  --color-eng-blue-900: #0B1C2D;
+  --color-eng-blue-950: #050E17;
+
+  --color-sky-blue-50: #f0f9ff;
+  --color-sky-blue-100: #e0f2fe;
+  --color-sky-blue-200: #bae6fd;
+  --color-sky-blue-300: #7dd3fc;
+  --color-sky-blue-400: #38bdf8;
+  --color-sky-blue-500: #0ea5e9;
+  --color-sky-blue-600: #0284c7;
+
+  --color-cyan-accent: #00E5FF;
+}
+
+/* Enable class-based dark mode in Tailwind 4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg-app: #ffffff;
+  --text-app: #1e293b;
+  /* Darker slate (900/800 mix) for better legibility */
+  --glass-bg: rgba(255, 255, 255, 0.9);
+  /* More opaque in Light Mode */
+  --glass-border: rgba(203, 213, 225, 0.5);
+  /* Stronger border */
+}
+
+.dark {
+  --bg-app: #0B1C2D;
+  --text-app: #f1f5f9;
+  --glass-bg: rgba(11, 28, 45, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+}
+
+@layer base {
+  body {
+    font-family: Inter, sans-serif;
+    background-color: var(--bg-app);
+    color: var(--text-app);
+    @apply antialiased transition-colors duration-300;
+  }
+}
+
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
