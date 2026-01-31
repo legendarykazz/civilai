@@ -6,7 +6,7 @@
             "destination": "https://nelsonmontez95.app.n8n.cloud/webhook/a813426f-1e24-4114-a2fc-1de9a9216d1a/chat"
         },
         {
-            "source": "/((?!api/chat|assets/|favicon.ico).* )",
+            "source": "/((?!api/chat|assets/|favicon.ico).*)",
             "destination": "/index.html"
         }
     ],
