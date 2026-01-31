@@ -206,6 +206,63 @@ const AdminDashboard = () => {
                                     />
                                 </div>
 
+                                <div className="border-t border-slate-200 dark:border-slate-800 my-6"></div>
+                                <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">Guidance Cards</h3>
+
+                                {/* Card 1 */}
+                                <div className="p-4 bg-slate-50 dark:bg-eng-blue-950 rounded-xl space-y-4 border border-slate-200 dark:border-slate-800">
+                                    <input
+                                        type="text"
+                                        defaultValue={siteContent.card_1_title || 'General Rules'}
+                                        onBlur={(e) => handleContentUpdate('card_1_title', e.target.value)}
+                                        className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 font-bold bg-white dark:bg-eng-blue-900 text-slate-900 dark:text-white"
+                                        placeholder="Card 1 Title"
+                                    />
+                                    <textarea
+                                        rows="5"
+                                        defaultValue={siteContent.card_1_list || ''}
+                                        onBlur={(e) => handleContentUpdate('card_1_list', e.target.value)}
+                                        className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-eng-blue-900 text-slate-900 dark:text-white text-sm"
+                                        placeholder="List items (one per line)"
+                                    />
+                                </div>
+
+                                {/* Card 2 */}
+                                <div className="p-4 bg-slate-50 dark:bg-eng-blue-950 rounded-xl space-y-4 border border-slate-200 dark:border-slate-800">
+                                    <input
+                                        type="text"
+                                        defaultValue={siteContent.card_2_title || 'Code Principles'}
+                                        onBlur={(e) => handleContentUpdate('card_2_title', e.target.value)}
+                                        className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 font-bold bg-white dark:bg-eng-blue-900 text-slate-900 dark:text-white"
+                                        placeholder="Card 2 Title"
+                                    />
+                                    <textarea
+                                        rows="5"
+                                        defaultValue={siteContent.card_2_list || ''}
+                                        onBlur={(e) => handleContentUpdate('card_2_list', e.target.value)}
+                                        className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-eng-blue-900 text-slate-900 dark:text-white text-sm"
+                                        placeholder="List items (one per line)"
+                                    />
+                                </div>
+
+                                {/* Card 3 */}
+                                <div className="p-4 bg-slate-50 dark:bg-eng-blue-950 rounded-xl space-y-4 border border-slate-200 dark:border-slate-800">
+                                    <input
+                                        type="text"
+                                        defaultValue={siteContent.card_3_title || 'Common Errors'}
+                                        onBlur={(e) => handleContentUpdate('card_3_title', e.target.value)}
+                                        className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 font-bold bg-white dark:bg-eng-blue-900 text-slate-900 dark:text-white"
+                                        placeholder="Card 3 Title"
+                                    />
+                                    <textarea
+                                        rows="5"
+                                        defaultValue={siteContent.card_3_list || ''}
+                                        onBlur={(e) => handleContentUpdate('card_3_list', e.target.value)}
+                                        className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-eng-blue-900 text-slate-900 dark:text-white text-sm"
+                                        placeholder="List items (one per line)"
+                                    />
+                                </div>
+
                             </div>
                         )}
                     </div>

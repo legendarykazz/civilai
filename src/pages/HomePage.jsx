@@ -8,7 +8,14 @@ const HomePage = () => {
     const [content, setContent] = useState({
         home_hero_title: 'Engineering Intelligence for Smarter Structures',
         home_hero_subtitle: "The world's most advanced AI platform for civil structural analysis. Get real-time design guidance, automate workflows, and solve complex engineering challenges instantly.",
-        home_rules_title: 'Core Engineering Rules & Design Guidelines'
+        home_rules_title: 'Core Engineering Rules & Design Guidelines',
+        // Default Card Content (Fallbacks)
+        card_1_title: 'General Rules',
+        card_1_list: '• Safety factors over theoretical strength\n• Continuous load paths from roof to base\n• No reliance on single critical elements\n• Serviceability equals strength limits\n• Justify every stated assumption',
+        card_2_title: 'Code Principles',
+        card_2_list: '• Apply partial safety factors to materials\n• Separate dead vs imposed load cases\n• Check Buckling, Deflection, Capacity\n• Stability governs slender members\n• Connections match member reliability',
+        card_3_title: 'Common Errors',
+        card_3_list: '❌ Ignoring compression buckling\n❌ Under-designed connection details\n❌ Forgetting corrosion allowances\n❌ Incorrect column effective lengths\n❌ Mixing units (kN, N, mm)'
     });
 
     // Widgets State
@@ -37,6 +44,14 @@ const HomePage = () => {
         };
         loadContent();
     }, []);
+
+    // Helper to render lists from CMS text (split by new lines)
+    const renderList = (text) => {
+        if (!text) return null;
+        return text.split('\n').map((item, index) => (
+            <li key={index}>{item}</li>
+        ));
+    };
 
     return (
         <div className="overflow-hidden">
@@ -185,15 +200,11 @@ const HomePage = () => {
                                     <div className="h-10 w-10 flex items-center justify-center rounded-lg bg-eng-blue-600/10 dark:bg-cyan-accent/10 text-eng-blue-600 dark:text-cyan-accent group-hover:scale-110 transition-transform font-bold">
                                         <ShieldCheck size={24} />
                                     </div>
-                                    General Rules
+                                    {content.card_1_title}
                                 </dt>
                                 <dd className="flex flex-auto flex-col text-sm leading-7 text-slate-800 dark:text-slate-400">
                                     <ul className="space-y-2">
-                                        <li>• Safety factors over theoretical strength</li>
-                                        <li>• Continuous load paths from roof to base</li>
-                                        <li>• No reliance on single critical elements</li>
-                                        <li>• Serviceability equals strength limits</li>
-                                        <li>• Justify every stated assumption</li>
+                                        {renderList(content.card_1_list)}
                                     </ul>
                                 </dd>
                             </div>
@@ -204,15 +215,11 @@ const HomePage = () => {
                                     <div className="h-10 w-10 flex items-center justify-center rounded-lg bg-eng-blue-600/10 dark:bg-cyan-accent/10 text-eng-blue-600 dark:text-cyan-accent group-hover:scale-110 transition-transform">
                                         <Cpu size={24} />
                                     </div>
-                                    Code Principles
+                                    {content.card_2_title}
                                 </dt>
                                 <dd className="flex flex-auto flex-col text-sm leading-7 text-slate-800 dark:text-slate-400">
                                     <ul className="space-y-2">
-                                        <li>• Apply partial safety factors to materials</li>
-                                        <li>• Separate dead vs imposed load cases</li>
-                                        <li>• Check Buckling, Deflection, Capacity</li>
-                                        <li>• Stability governs slender members</li>
-                                        <li>• Connections match member reliability</li>
+                                        {renderList(content.card_2_list)}
                                     </ul>
                                 </dd>
                             </div>
@@ -223,15 +230,11 @@ const HomePage = () => {
                                     <div className="h-10 w-10 flex items-center justify-center rounded-lg bg-red-600/10 text-red-600 group-hover:scale-110 transition-transform">
                                         <X size={24} />
                                     </div>
-                                    Common Errors
+                                    {content.card_3_title}
                                 </dt>
                                 <dd className="flex flex-auto flex-col text-sm leading-7 text-slate-900 dark:text-slate-200 font-bold">
                                     <ul className="space-y-2">
-                                        <li>❌ Ignoring compression buckling</li>
-                                        <li>❌ Under-designed connection details</li>
-                                        <li>❌ Forgetting corrosion allowances</li>
-                                        <li>❌ Incorrect column effective lengths</li>
-                                        <li>❌ Mixing units (kN, N, mm)</li>
+                                        {renderList(content.card_3_list)}
                                     </ul>
                                 </dd>
                             </div>
