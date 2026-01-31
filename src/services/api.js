@@ -3,7 +3,7 @@ import { supabase } from './supabase';
 class SupabaseService {
 
     // --- Blog API ---
-    async getBlogs(onlyApproved = false) {
+    async getBlogs(onlyApproved = false, limit = null) {
         let query = supabase
             .from('blogs')
             .select('*')
@@ -11,6 +11,10 @@ class SupabaseService {
 
         if (onlyApproved) {
             query = query.eq('status', 'approved');
+        }
+
+        if (limit) {
+            query = query.limit(limit);
         }
 
         const { data, error } = await query;
@@ -91,13 +95,17 @@ class SupabaseService {
     }
 
     // --- Forum API ---
-    async getQuestions() {
-        const { data, error } = await supabase
+    async getQuestions(limit = null) {
+        let query = supabase
             .from('questions')
             .select('*')
             .order('created_at', { ascending: false });
 
-        if (error) throw error;
+        if (limit) {
+            query = query.limit(limit);
+        }
+
+        const { data, error } = await query;
         return data.map(this._mapQuestion);
     }
 

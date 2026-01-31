@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, Bot, Cpu, Layers, MessageSquare, Globe, ShieldCheck, Sparkles, X } from 'lucide-react';
+import { ArrowRight, Bot, Cpu, Layers, MessageSquare, Globe, ShieldCheck, Sparkles, X, TrendingUp, BookOpen } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { api } from '../services/api';
 
@@ -11,14 +11,28 @@ const HomePage = () => {
         home_rules_title: 'Core Engineering Rules & Design Guidelines'
     });
 
+    // Widgets State
+    const [latestBlogs, setLatestBlogs] = useState([]);
+    const [trendingQuestions, setTrendingQuestions] = useState([]);
+    const [widgetsLoading, setWidgetsLoading] = useState(true);
+
     useEffect(() => {
         const loadContent = async () => {
             try {
-                const data = await api.getSiteContent();
-                // Merge with defaults to ensure no blanks if keys missing
-                setContent(prev => ({ ...prev, ...data }));
+                // Parallel fetching for speed
+                const [cmsData, blogsData, questionsData] = await Promise.all([
+                    api.getSiteContent(),
+                    api.getBlogs(true, 3), // Get top 3
+                    api.getQuestions(3)    // Get top 3
+                ]);
+
+                setContent(prev => ({ ...prev, ...cmsData }));
+                setLatestBlogs(blogsData);
+                setTrendingQuestions(questionsData);
             } catch (error) {
-                console.error("Failed to load CMS content", error);
+                console.error("Failed to load page content", error);
+            } finally {
+                setWidgetsLoading(false);
             }
         };
         loadContent();
@@ -57,6 +71,95 @@ const HomePage = () => {
                         >
                             Ask AI Assistant
                         </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Community Pulse Section (Widgets) */}
+            <div className="bg-white dark:bg-eng-blue-950 py-16 border-b border-slate-200 dark:border-slate-800">
+                <div className="mx-auto max-w-7xl px-6 lg:px-8">
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-8 flex items-center gap-2">
+                        <TrendingUp className="text-eng-blue-600 dark:text-cyan-accent" /> Community Pulse
+                    </h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Latest Blogs Widget */}
+                        <div className="glass-panel p-6 rounded-2xl bg-slate-50 dark:bg-eng-blue-900 border border-slate-200 dark:border-slate-800">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <BookOpen size={20} className="text-eng-blue-500" /> Latest Insights
+                                </h3>
+                                <Link to="/blog" className="text-sm text-eng-blue-600 hover:text-eng-blue-500 font-medium flex items-center gap-1">
+                                    View All <ArrowRight size={14} />
+                                </Link>
+                            </div>
+
+                            {widgetsLoading ? (
+                                <div className="space-y-4 animate-pulse">
+                                    {[1, 2, 3].map(i => <div key={i} className="h-16 bg-slate-200 dark:bg-eng-blue-800 rounded-lg"></div>)}
+                                </div>
+                            ) : latestBlogs.length > 0 ? (
+                                <div className="space-y-4">
+                                    {latestBlogs.map(blog => (
+                                        <Link key={blog.id} to={`/blog/${blog.id}`} className="block group">
+                                            <div className="flex gap-4 p-3 rounded-xl hover:bg-white dark:hover:bg-eng-blue-800 transition-colors">
+                                                {blog.image && (
+                                                    <img src={blog.image} alt="" className="w-16 h-16 object-cover rounded-lg flex-shrink-0" />
+                                                )}
+                                                <div>
+                                                    <h4 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-eng-blue-600 dark:group-hover:text-cyan-accent transition-colors line-clamp-1">{blog.title}</h4>
+                                                    <p className="text-xs text-slate-500 mt-1 line-clamp-2">{blog.excerpt}</p>
+                                                    <span className="text-xs text-slate-400 mt-1 block">{blog.date}</span>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-slate-500 italic">No posts yet. Be the first to write one!</p>
+                            )}
+                        </div>
+
+                        {/* Trending Questions Widget */}
+                        <div className="glass-panel p-6 rounded-2xl bg-slate-50 dark:bg-eng-blue-900 border border-slate-200 dark:border-slate-800">
+                            <div className="flex justify-between items-center mb-6">
+                                <h3 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <MessageSquare size={20} className="text-green-500" /> Active Discussions
+                                </h3>
+                                <Link to="/forum" className="text-sm text-eng-blue-600 hover:text-eng-blue-500 font-medium flex items-center gap-1">
+                                    Join Forum <ArrowRight size={14} />
+                                </Link>
+                            </div>
+
+                            {widgetsLoading ? (
+                                <div className="space-y-4 animate-pulse">
+                                    {[1, 2, 3].map(i => <div key={i} className="h-12 bg-slate-200 dark:bg-eng-blue-800 rounded-lg"></div>)}
+                                </div>
+                            ) : trendingQuestions.length > 0 ? (
+                                <div className="divide-y divide-slate-200 dark:divide-slate-800">
+                                    {trendingQuestions.map(q => (
+                                        <Link key={q.id} to={`/forum/${q.id}`} className="block group py-3 first:pt-0 last:pb-0">
+                                            <div className="flex justify-between items-start gap-4">
+                                                <div>
+                                                    <h4 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-eng-blue-600 dark:group-hover:text-cyan-accent transition-colors line-clamp-1">{q.title}</h4>
+                                                    <div className="flex gap-2 mt-1">
+                                                        {q.tags.slice(0, 2).map(tag => (
+                                                            <span key={tag} className="text-[10px] bg-slate-200 dark:bg-eng-blue-800 text-slate-600 dark:text-slate-300 px-1.5 py-0.5 rounded">{tag}</span>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                <div className="flex flex-col items-center min-w-[3rem]">
+                                                    <span className="text-xs font-bold text-slate-900 dark:text-white">{q.answers ? q.answers.length : 0}</span>
+                                                    <span className="text-[10px] text-slate-500">replies</span>
+                                                </div>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="text-sm text-slate-500 italic">No questions yet. Ask something!</p>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
