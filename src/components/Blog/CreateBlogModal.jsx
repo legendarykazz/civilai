@@ -109,18 +109,52 @@ const CreateBlogModal = ({ isOpen, onClose, onPostCreated }) => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {/* Image URL */}
+                        {/* Image Upload */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Cover Image URL</label>
-                            <div className="relative">
-                                <ImageIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">Cover Image</label>
+                            <div className="relative group">
                                 <input
-                                    type="url"
-                                    placeholder="https://..."
-                                    value={formData.image}
-                                    onChange={e => setFormData({ ...formData, image: e.target.value })}
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-eng-blue-950 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-eng-blue-600 outline-none text-slate-900 dark:text-white"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={async (e) => {
+                                        const file = e.target.files[0];
+                                        if (!file) return;
+                                        setLoading(true);
+                                        try {
+                                            const url = await api.uploadImage(file);
+                                            setFormData(prev => ({ ...prev, image: url }));
+                                        } catch (err) {
+                                            console.error("Upload failed", err);
+                                            alert("Failed to upload image");
+                                        } finally {
+                                            setLoading(false);
+                                        }
+                                    }}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                                 />
+                                <div className={`w-full p-3 rounded-xl border-2 border-dashed transition-all flex items-center justify-center gap-2 overflow-hidden bg-slate-50 dark:bg-eng-blue-950 ${formData.image ? 'border-eng-blue-500 bg-eng-blue-50/10' : 'border-slate-300 dark:border-slate-700 hover:border-eng-blue-400'}`}>
+                                    {formData.image ? (
+                                        <div className="relative w-full h-10 flex items-center gap-3">
+                                            <img src={formData.image} alt="Preview" className="h-10 w-10 object-cover rounded-lg" />
+                                            <span className="text-xs text-green-600 font-bold truncate flex-1">Image Uploaded</span>
+                                            <button
+                                                type="button"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    setFormData(prev => ({ ...prev, image: '' }));
+                                                }}
+                                                className="z-20 p-1 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex items-center gap-2 text-slate-400">
+                                            <ImageIcon size={18} />
+                                            <span className="text-sm">Click to Upload Image</span>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
 
