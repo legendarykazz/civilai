@@ -1,17 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../services/api';
-import { ArrowLeft, MessageSquare, ThumbsUp, User, Clock, CheckCircle, Image as ImageIcon, X, Loader2 } from 'lucide-react';
+import { ArrowLeft, MessageSquare, ThumbsUp, User, Clock, CheckCircle, Image as ImageIcon, X, Loader2, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const ForumPostPage = () => {
     const { id } = useParams();
-    const { user, login } = useAuth();
+    const { user } = useAuth(); // No login needed, manual entry
     const [question, setQuestion] = useState(null);
     const [loading, setLoading] = useState(true);
 
     // Answer State
-    const [answerText, setAnswerText] = useState('');
+    const [answerData, setAnswerData] = useState({
+        content: '',
+        name: '',
+        email: ''
+    });
     const [answerImage, setAnswerImage] = useState('');
     const [submitting, setSubmitting] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -54,24 +58,20 @@ const ForumPostPage = () => {
 
     const handleSubmitAnswer = async (e) => {
         e.preventDefault();
-        if (!answerText.trim()) return;
+        if (!answerData.content.trim() || !answerData.name || !answerData.email) return;
         setSubmitting(true);
 
         try {
-            let currentUser = user;
-            if (!currentUser) {
-                currentUser = await login('Guest_Engineer');
-            }
-
             const newAnswer = {
-                content: answerText,
+                content: answerData.content,
                 image: answerImage,
-                author: currentUser.name,
+                author: answerData.name,
+                email: answerData.email,
                 votes: 0
             };
 
             await api.addAnswer(id, newAnswer);
-            setAnswerText('');
+            setAnswerData({ content: '', name: '', email: '' });
             setAnswerImage('');
             loadQuestion(); // Refresh
         } catch (error) {
@@ -175,11 +175,43 @@ const ForumPostPage = () => {
 
             {/* Post Answer */}
             <div className="bg-white dark:bg-eng-blue-900 p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl shadow-eng-blue-900/5">
-                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Your Answer</h3>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-4">Your Professional Answer</h3>
                 <form onSubmit={handleSubmitAnswer}>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div className="space-y-1">
+                            <label className="text-sm font-semibold text-slate-600 dark:text-slate-400">Name</label>
+                            <div className="relative">
+                                <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                <input
+                                    required
+                                    type="text"
+                                    placeholder="Your Full Name"
+                                    value={answerData.name}
+                                    onChange={e => setAnswerData({ ...answerData, name: e.target.value })}
+                                    className="w-full pl-9 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-eng-blue-950 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-eng-blue-600 outline-none text-slate-900 dark:text-white text-sm"
+                                />
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-sm font-semibold text-slate-600 dark:text-slate-400">Email (Visible only to admin)</label>
+                            <div className="relative">
+                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                                <input
+                                    required
+                                    type="email"
+                                    placeholder="work@example.com"
+                                    value={answerData.email}
+                                    onChange={e => setAnswerData({ ...answerData, email: e.target.value })}
+                                    className="w-full pl-9 pr-4 py-3 rounded-xl bg-slate-50 dark:bg-eng-blue-950 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-eng-blue-600 outline-none text-slate-900 dark:text-white text-sm"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
                     <textarea
-                        value={answerText}
-                        onChange={(e) => setAnswerText(e.target.value)}
+                        value={answerData.content}
+                        onChange={(e) => setAnswerData({ ...answerData, content: e.target.value })}
                         placeholder="Type your professional advice here..."
                         rows="4"
                         className="w-full p-4 rounded-xl bg-slate-50 dark:bg-eng-blue-950 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-eng-blue-600 outline-none text-slate-900 dark:text-white mb-4"
@@ -218,7 +250,7 @@ const ForumPostPage = () => {
                     <div className="flex justify-end">
                         <button
                             type="submit"
-                            disabled={submitting || !answerText.trim()}
+                            disabled={submitting || !answerData.content.trim() || !answerData.name}
                             className="bg-eng-blue-600 hover:bg-eng-blue-500 text-white px-8 py-3 rounded-xl font-semibold shadow-lg shadow-eng-blue-600/30 disabled:opacity-50 transition-all hover:-translate-y-1"
                         >
                             {submitting ? 'Posting...' : 'Post Answer'}

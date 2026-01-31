@@ -132,6 +132,7 @@ class SupabaseService {
                 image_url: question.image,
                 tags: question.tags,
                 author_name: question.author,
+                author_email: question.email, // Added email
                 views: 0,
                 votes: 0
             }])
@@ -150,6 +151,7 @@ class SupabaseService {
                 content: answer.content,
                 image_url: answer.image,
                 author_name: answer.author,
+                author_email: answer.email, // Added email
                 votes: 0
             }])
             .select()
