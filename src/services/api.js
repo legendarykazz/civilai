@@ -129,6 +129,7 @@ class SupabaseService {
             .insert([{
                 title: question.title,
                 content: question.content,
+                image_url: question.image,
                 tags: question.tags,
                 author_name: question.author,
                 views: 0,
@@ -147,6 +148,7 @@ class SupabaseService {
             .insert([{
                 question_id: questionId,
                 content: answer.content,
+                image_url: answer.image,
                 author_name: answer.author,
                 votes: 0
             }])
@@ -192,6 +194,7 @@ class SupabaseService {
             id: dbQ.id,
             title: dbQ.title,
             content: dbQ.content,
+            image: dbQ.image_url,
             tags: dbQ.tags || [],
             author: dbQ.author_name || 'Anonymous',
             views: dbQ.views,
@@ -200,6 +203,7 @@ class SupabaseService {
             answers: (dbQ.answers || []).map(a => ({
                 id: a.id,
                 content: a.content,
+                image: a.image_url,
                 author: a.author_name,
                 votes: a.votes,
                 date: a.created_at
@@ -211,6 +215,7 @@ class SupabaseService {
         return {
             id: dbA.id,
             content: dbA.content,
+            image: dbA.image_url,
             author: dbA.author_name,
             votes: dbA.votes,
             date: dbA.created_at

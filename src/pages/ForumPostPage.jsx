@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { api } from '../services/api';
-import { ArrowLeft, MessageSquare, ThumbsUp, User, Clock, CheckCircle } from 'lucide-react';
+import { ArrowLeft, MessageSquare, ThumbsUp, User, Clock, CheckCircle, Image as ImageIcon, X, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 const ForumPostPage = () => {
@@ -9,8 +9,12 @@ const ForumPostPage = () => {
     const { user, login } = useAuth();
     const [question, setQuestion] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    // Answer State
     const [answerText, setAnswerText] = useState('');
+    const [answerImage, setAnswerImage] = useState('');
     const [submitting, setSubmitting] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     const loadQuestion = async () => {
         try {
@@ -33,6 +37,21 @@ const ForumPostPage = () => {
         await api.voteQuestion(id, user?.id || 'anon');
     };
 
+    const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        setUploading(true);
+        try {
+            const url = await api.uploadImage(file);
+            setAnswerImage(url);
+        } catch (error) {
+            console.error(error);
+            alert("Image upload failed");
+        } finally {
+            setUploading(false);
+        }
+    };
+
     const handleSubmitAnswer = async (e) => {
         e.preventDefault();
         if (!answerText.trim()) return;
@@ -46,12 +65,14 @@ const ForumPostPage = () => {
 
             const newAnswer = {
                 content: answerText,
+                image: answerImage,
                 author: currentUser.name,
                 votes: 0
             };
 
             await api.addAnswer(id, newAnswer);
             setAnswerText('');
+            setAnswerImage('');
             loadQuestion(); // Refresh
         } catch (error) {
             console.error(error);
@@ -89,6 +110,13 @@ const ForumPostPage = () => {
                         <div className="prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 mb-6 whitespace-pre-wrap">
                             {question.content}
                         </div>
+
+                        {/* Question Image Attachment */}
+                        {question.image && (
+                            <div className="mb-6">
+                                <img src={question.image} alt="Attachment" className="rounded-xl max-h-96 object-contain border border-slate-200 dark:border-slate-800" />
+                            </div>
+                        )}
 
                         <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500 border-t border-slate-100 dark:border-white/5 pt-6">
                             <div className="flex items-center gap-2">
@@ -128,9 +156,14 @@ const ForumPostPage = () => {
                                     <span className="font-bold text-slate-900 dark:text-white text-sm">{answer.author}</span>
                                     <span className="text-xs text-slate-500">{new Date(answer.date).toLocaleDateString()}</span>
                                 </div>
-                                <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">
+                                <p className="text-slate-700 dark:text-slate-300 text-sm leading-relaxed whitespace-pre-wrap mb-4">
                                     {answer.content}
                                 </p>
+                                {answer.image && (
+                                    <div className="mb-2">
+                                        <img src={answer.image} alt="Answer attachment" className="rounded-lg max-h-64 object-contain border border-slate-200 dark:border-slate-700 bg-white dark:bg-black/20" />
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}
@@ -151,6 +184,37 @@ const ForumPostPage = () => {
                         rows="4"
                         className="w-full p-4 rounded-xl bg-slate-50 dark:bg-eng-blue-950 border border-slate-200 dark:border-slate-700 focus:ring-2 focus:ring-eng-blue-600 outline-none text-slate-900 dark:text-white mb-4"
                     />
+
+                    {/* Attachment Preview / Upload */}
+                    <div className="mb-4">
+                        {answerImage ? (
+                            <div className="relative inline-block group">
+                                <img src={answerImage} alt="Attachment preview" className="h-20 w-auto rounded-lg border border-slate-200 dark:border-slate-700" />
+                                <button
+                                    type="button"
+                                    onClick={() => setAnswerImage('')}
+                                    className="absolute -top-2 -right-2 p-1 bg-red-500 text-white rounded-full shadow-md hover:bg-red-600 transition-colors"
+                                >
+                                    <X size={12} />
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="relative inline-block">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageUpload}
+                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    disabled={uploading}
+                                />
+                                <button type="button" className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${uploading ? 'bg-slate-100 text-slate-400' : 'bg-slate-100 dark:bg-eng-blue-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-eng-blue-700'}`}>
+                                    {uploading ? <Loader2 className="animate-spin" size={16} /> : <ImageIcon size={16} />}
+                                    {uploading ? 'Uploading...' : 'Attach Image'}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+
                     <div className="flex justify-end">
                         <button
                             type="submit"
