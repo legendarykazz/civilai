@@ -12,7 +12,7 @@ const BlogPage = () => {
     const loadPosts = async () => {
         setLoading(true);
         try {
-            const data = await api.getBlogs();
+            const data = await api.getBlogs(true); // Only Approved
             setPosts(data);
         } catch (error) {
             console.error("Failed to load blogs", error);

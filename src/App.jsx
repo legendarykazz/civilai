@@ -7,6 +7,7 @@ import BlogPage from './pages/BlogPage';
 import BlogPostPage from './pages/BlogPostPage';
 import ForumPage from './pages/ForumPage';
 import ForumPostPage from './pages/ForumPostPage';
+import AdminDashboard from './pages/AdminDashboard';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="blog/:id" element={<BlogPostPage />} />
             <Route path="forum" element={<ForumPage />} />
             <Route path="forum/:id" element={<ForumPostPage />} />
+            <Route path="admin" element={<AdminDashboard />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

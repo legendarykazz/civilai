@@ -3,12 +3,17 @@ import { supabase } from './supabase';
 class SupabaseService {
 
     // --- Blog API ---
-    async getBlogs() {
-        const { data, error } = await supabase
+    async getBlogs(onlyApproved = false) {
+        let query = supabase
             .from('blogs')
             .select('*')
             .order('created_at', { ascending: false });
 
+        if (onlyApproved) {
+            query = query.eq('status', 'approved');
+        }
+
+        const { data, error } = await query;
         if (error) throw error;
         return data.map(this._mapBlog);
     }
@@ -34,13 +39,55 @@ class SupabaseService {
                 image_url: post.image,
                 tags: post.tags,
                 author_name: post.author,
-                likes: 0
+                likes: 0,
+                status: 'pending' // Default to pending
             }])
             .select()
             .single();
 
         if (error) throw error;
         return this._mapBlog(data);
+    }
+
+    async updateBlogStatus(id, status) {
+        const { data, error } = await supabase
+            .from('blogs')
+            .update({ status })
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (error) throw error;
+        return this._mapBlog(data);
+    }
+
+    // --- Admin CMS API ---
+    async getSiteContent() {
+        const { data, error } = await supabase
+            .from('site_content')
+            .select('*');
+
+        if (error) {
+            console.error('CMS Error:', error);
+            return {};
+        }
+
+        // Convert array to object key:value
+        return data.reduce((acc, item) => {
+            acc[item.key] = item.value;
+            return acc;
+        }, {});
+    }
+
+    async updateSiteContent(key, value, section = 'home') {
+        const { data, error } = await supabase
+            .from('site_content')
+            .upsert({ key, value, section })
+            .select()
+            .single();
+
+        if (error) throw error;
+        return data;
     }
 
     // --- Forum API ---
@@ -51,14 +98,6 @@ class SupabaseService {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-        // Fetch answers count efficiently? For now just fetch all questions.
-        // We could use a .select('*, answers(count)') if relations were tight, 
-        // but for now let's keep it simple.
-
-        // Let's get answer counts separately or just client side length for now if we fetch answers? 
-        // Better: let's fetch answers with it? No, too heavy.
-        // We'll stick to a simple mapping.
-
         return data.map(this._mapQuestion);
     }
 
@@ -111,13 +150,10 @@ class SupabaseService {
     }
 
     async voteQuestion(questionId, userId, direction = 'up') {
-        // RPC call would be better for atomic increments, but we'll do read-write for now
-        // or just a raw simplified update since we don't have atomic counters set up in SQL yet
         const { data, error } = await supabase.rpc('increment_vote', { row_id: questionId });
 
-        // Fallback if RPC doesn't exist (likely won't unless we make it):
         if (error) {
-            // Fetch current
+            // Fallback optimistic update
             const { data: q } = await supabase.from('questions').select('votes').eq('id', questionId).single();
             if (q) {
                 await supabase.from('questions').update({ votes: q.votes + 1 }).eq('id', questionId);
@@ -125,7 +161,7 @@ class SupabaseService {
         }
     }
 
-    // --- Mappers to keep UI consistent ---
+    // --- Mappers ---
     _mapBlog(dbPost) {
         if (!dbPost) return null;
         return {
@@ -137,7 +173,8 @@ class SupabaseService {
             tags: dbPost.tags || [],
             author: dbPost.author_name || 'Unknown',
             date: new Date(dbPost.created_at).toLocaleDateString(),
-            likes: dbPost.likes
+            likes: dbPost.likes,
+            status: dbPost.status
         };
     }
 

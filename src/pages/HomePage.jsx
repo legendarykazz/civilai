@@ -1,8 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight, Bot, Cpu, Layers, MessageSquare, Globe, ShieldCheck, Sparkles, X } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { api } from '../services/api';
 
 const HomePage = () => {
+    // Dynamic Content State
+    const [content, setContent] = useState({
+        home_hero_title: 'Engineering Intelligence for Smarter Structures',
+        home_hero_subtitle: "The world's most advanced AI platform for civil structural analysis. Get real-time design guidance, automate workflows, and solve complex engineering challenges instantly.",
+        home_rules_title: 'Core Engineering Rules & Design Guidelines'
+    });
+
+    useEffect(() => {
+        const loadContent = async () => {
+            try {
+                const data = await api.getSiteContent();
+                // Merge with defaults to ensure no blanks if keys missing
+                setContent(prev => ({ ...prev, ...data }));
+            } catch (error) {
+                console.error("Failed to load CMS content", error);
+            }
+        };
+        loadContent();
+    }, []);
+
     return (
         <div className="overflow-hidden">
 
@@ -22,11 +43,11 @@ const HomePage = () => {
 
                 <div className="mx-auto max-w-7xl px-6 lg:px-8 py-32 text-center">
                     <h1 className="mx-auto max-w-4xl text-5xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-7xl mb-8 animate-in slide-in-from-bottom-5 fade-in duration-800 delay-100">
-                        Engineering Intelligence for <span className="text-transparent bg-clip-text bg-gradient-to-r from-eng-blue-600 to-cyan-accent">Smarter Structures</span>
+                        {content.home_hero_title}
                     </h1>
 
                     <p className="mx-auto max-w-2xl text-lg leading-8 text-slate-800 dark:text-slate-300 mb-12 animate-in slide-in-from-bottom-5 fade-in duration-1000 delay-200">
-                        The world's most advanced AI platform for civil structural analysis. Get real-time design guidance, automate workflows, and solve complex engineering challenges instantly.
+                        {content.home_hero_subtitle}
                     </p>
 
                     <div className="flex items-center justify-center gap-6 animate-in slide-in-from-bottom-5 fade-in duration-1000 delay-300">
@@ -46,7 +67,7 @@ const HomePage = () => {
                     <div className="mx-auto max-w-2xl lg:text-center mb-16">
                         <h2 className="text-base font-semibold leading-7 text-eng-blue-600 dark:text-cyan-accent uppercase tracking-wider">Expert Guidance</h2>
                         <p className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
-                            Core Engineering Rules & Design Guidelines
+                            {content.home_rules_title}
                         </p>
                         <p className="mt-4 text-base text-slate-800 dark:text-slate-400">
                             Practical rules, common code principles, and frequent steel design mistakes every engineer should know.
