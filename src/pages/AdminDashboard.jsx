@@ -1,17 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../services/api';
-import { Check, X, Edit, Layout, FileText, Lock, Save, Loader2 } from 'lucide-react';
+import { Check, X, Edit, Layout, FileText, Lock, Save, Loader2, RotateCcw } from 'lucide-react';
 
 const AdminDashboard = () => {
-    // Auth State (Simple Passcode)
+    // Auth State
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [passcode, setPasscode] = useState('');
 
     // Data State
     const [activeTab, setActiveTab] = useState('blogs');
     const [blogs, setBlogs] = useState([]);
+
+    // Content State (Local Buffer)
     const [siteContent, setSiteContent] = useState({});
+    const [initialContent, setInitialContent] = useState({}); // To detect changes
     const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [isDirty, setIsDirty] = useState(false);
 
     // Initial Load
     useEffect(() => {
@@ -24,11 +29,13 @@ const AdminDashboard = () => {
         setLoading(true);
         try {
             if (activeTab === 'blogs') {
-                const data = await api.getBlogs(false); // Get all (including pending)
+                const data = await api.getBlogs(false);
                 setBlogs(data);
             } else {
                 const content = await api.getSiteContent();
                 setSiteContent(content);
+                setInitialContent(content);
+                setIsDirty(false);
             }
         } catch (error) {
             console.error('Failed to load admin data', error);
@@ -39,7 +46,6 @@ const AdminDashboard = () => {
 
     const handleLogin = (e) => {
         e.preventDefault();
-        // Hardcoded secret for demo - simple but effective for "Day 2"
         if (passcode === 'admin123') {
             setIsAuthenticated(true);
         } else {
@@ -49,27 +55,54 @@ const AdminDashboard = () => {
 
     // --- Blog Actions ---
     const handleStatusChange = async (id, newStatus) => {
-        // Optimistic update
         setBlogs(prev => prev.map(b => b.id === id ? { ...b, status: newStatus } : b));
-
         try {
             await api.updateBlogStatus(id, newStatus);
         } catch (error) {
             console.error('Failed to update status');
-            // Revert would go here
         }
     };
 
-    // --- Content Actions ---
-    const handleContentUpdate = async (key, value) => {
+    // --- Content Actions (Local State) ---
+    const handleContentChange = (key, value) => {
+        setSiteContent(prev => ({
+            ...prev,
+            [key]: value
+        }));
+        setIsDirty(true);
+    };
+
+    // --- Save All Changes ---
+    const handleSaveChanges = async () => {
+        setSaving(true);
         try {
-            await api.updateSiteContent(key, value);
-            alert('Content updated successfully!');
+            // Save all changed keys
+            const promises = Object.keys(siteContent).map(key => {
+                if (siteContent[key] !== initialContent[key]) {
+                    return api.updateSiteContent(key, siteContent[key]);
+                }
+                return Promise.resolve();
+            });
+
+            await Promise.all(promises);
+            setInitialContent(siteContent); // Sync
+            setIsDirty(false);
+            alert('All changes saved successfully!');
         } catch (error) {
-            console.error('Failed to update content', error);
-            alert('Failed to save');
+            console.error('Failed to save content', error);
+            alert('Failed to save changes. Check console.');
+        } finally {
+            setSaving(false);
         }
     };
+
+    // --- Revert Changes ---
+    const handleDiscard = () => {
+        if (window.confirm('Discard all unsaved changes?')) {
+            setSiteContent(initialContent);
+            setIsDirty(false);
+        }
+    }
 
     if (!isAuthenticated) {
         return (
@@ -82,7 +115,7 @@ const AdminDashboard = () => {
                     <form onSubmit={handleLogin} className="space-y-4">
                         <input
                             type="password"
-                            placeholder="Enter Passcode (admin123)"
+                            placeholder="Enter Passcode"
                             value={passcode}
                             onChange={(e) => setPasscode(e.target.value)}
                             className="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-eng-blue-800 border-transparent focus:ring-2 focus:ring-eng-blue-600 outline-none dark:text-white"
@@ -99,24 +132,45 @@ const AdminDashboard = () => {
     return (
         <div className="min-h-screen bg-slate-50 dark:bg-eng-blue-950 pb-20">
             {/* Header */}
-            <div className="bg-eng-blue-900 text-white py-12 px-6">
-                <div className="max-w-7xl mx-auto flex justify-between items-end">
+            <div className="bg-eng-blue-900 text-white py-6 px-6 sticky top-0 z-50 shadow-lg">
+                <div className="max-w-7xl mx-auto flex justify-between items-center">
                     <div>
-                        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-                        <p className="text-eng-blue-200 mt-2">Manage content and moderate community</p>
+                        <h1 className="text-2xl font-bold">Admin Dashboard</h1>
                     </div>
-                    <button onClick={() => setIsAuthenticated(false)} className="text-sm bg-white/10 px-4 py-2 rounded-lg hover:bg-white/20 transition-colors">
-                        Logout
-                    </button>
+
+                    <div className="flex items-center gap-4">
+                        {activeTab === 'content' && isDirty && (
+                            <>
+                                <button
+                                    onClick={handleDiscard}
+                                    disabled={saving}
+                                    className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-500/20 text-red-200 hover:bg-red-500/30 transition-colors text-sm font-semibold"
+                                >
+                                    <RotateCcw size={16} /> Discard
+                                </button>
+                                <button
+                                    onClick={handleSaveChanges}
+                                    disabled={saving}
+                                    className="flex items-center gap-2 px-6 py-2 rounded-lg bg-cyan-accent text-eng-blue-900 hover:bg-white transition-colors font-bold shadow-lg"
+                                >
+                                    {saving ? <Loader2 className="animate-spin" size={18} /> : <Save size={18} />}
+                                    Save Changes
+                                </button>
+                            </>
+                        )}
+                        <button onClick={() => setIsAuthenticated(false)} className="text-sm text-white/70 hover:text-white transition-colors ml-4">
+                            Logout
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div className="max-w-7xl mx-auto px-6 -mt-8">
+            <div className="max-w-7xl mx-auto px-6 mt-8">
                 <div className="bg-white dark:bg-eng-blue-900 rounded-2xl shadow-xl min-h-[600px] border border-slate-200 dark:border-slate-800 flex overflow-hidden">
 
                     {/* Sidebar Tabs */}
-                    <div className="w-64 bg-slate-50 dark:bg-eng-blue-950 border-r border-slate-200 dark:border-slate-800 p-4">
-                        <div className="space-y-2">
+                    <div className="w-64 bg-slate-50 dark:bg-eng-blue-950 border-r border-slate-200 dark:border-slate-800 p-4 shrink-0">
+                        <div className="space-y-2 sticky top-4">
                             <button
                                 onClick={() => setActiveTab('blogs')}
                                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left font-medium transition-colors ${activeTab === 'blogs' ? 'bg-eng-blue-100 text-eng-blue-700 dark:bg-eng-blue-800 dark:text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-eng-blue-900'}`}
@@ -133,12 +187,13 @@ const AdminDashboard = () => {
                     </div>
 
                     {/* Content Area */}
-                    <div className="flex-1 p-8">
+                    <div className="flex-1 p-8 overflow-y-auto max-h-[calc(100vh-140px)]">
                         {loading ? (
                             <div className="flex justify-center py-20"><Loader2 className="animate-spin text-eng-blue-600" size={32} /></div>
                         ) : activeTab === 'blogs' ? (
                             <div className="space-y-6">
                                 <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Manage Blog Posts</h2>
+                                {blogs.length === 0 && <p className="text-slate-500 italic">No blogs found.</p>}
                                 {blogs.map(blog => (
                                     <div key={blog.id} className="flex items-center justify-between p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-eng-blue-950">
                                         <div className="flex-1">
@@ -166,21 +221,21 @@ const AdminDashboard = () => {
                                 ))}
                             </div>
                         ) : (
-                            <div className="space-y-8 max-w-2xl">
-                                <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-6">Home Page Content</h2>
+                            <div className="space-y-8 max-w-3xl pb-20">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h2 className="text-xl font-bold text-slate-900 dark:text-white">Home Page Editor</h2>
+                                    {isDirty && <span className="text-orange-500 text-sm font-semibold animate-pulse">● Unsaved Changes</span>}
+                                </div>
 
                                 {/* Hero Title Editor */}
                                 <div className="space-y-2">
                                     <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Hero Main Title</label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            defaultValue={siteContent.home_hero_title}
-                                            onBlur={(e) => handleContentUpdate('home_hero_title', e.target.value)}
-                                            className="flex-1 p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-eng-blue-800 text-slate-900 dark:text-white"
-                                        />
-                                    </div>
-                                    <p className="text-xs text-slate-500">Auto-saves on blur</p>
+                                    <input
+                                        type="text"
+                                        value={siteContent.home_hero_title || ''}
+                                        onChange={(e) => handleContentChange('home_hero_title', e.target.value)}
+                                        className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-eng-blue-800 text-slate-900 dark:text-white"
+                                    />
                                 </div>
 
                                 {/* Hero Subtitle Editor */}
@@ -188,11 +243,10 @@ const AdminDashboard = () => {
                                     <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Hero Subtitle</label>
                                     <textarea
                                         rows="3"
-                                        defaultValue={siteContent.home_hero_subtitle}
-                                        onBlur={(e) => handleContentUpdate('home_hero_subtitle', e.target.value)}
+                                        value={siteContent.home_hero_subtitle || ''}
+                                        onChange={(e) => handleContentChange('home_hero_subtitle', e.target.value)}
                                         className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-eng-blue-800 text-slate-900 dark:text-white"
                                     />
-                                    <p className="text-xs text-slate-500">Auto-saves on blur</p>
                                 </div>
 
                                 {/* Rules Title Editor */}
@@ -200,29 +254,30 @@ const AdminDashboard = () => {
                                     <label className="text-sm font-bold text-slate-700 dark:text-slate-300">Section Title (Rules)</label>
                                     <input
                                         type="text"
-                                        defaultValue={siteContent.home_rules_title}
-                                        onBlur={(e) => handleContentUpdate('home_rules_title', e.target.value)}
+                                        value={siteContent.home_rules_title || ''}
+                                        onChange={(e) => handleContentChange('home_rules_title', e.target.value)}
                                         className="w-full p-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-eng-blue-800 text-slate-900 dark:text-white"
                                     />
                                 </div>
 
                                 <div className="border-t border-slate-200 dark:border-slate-800 my-6"></div>
                                 <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200">Guidance Cards</h3>
+                                <p className="text-sm text-slate-500 mb-4">Edit the lists below. Use a new line for each bullet point.</p>
 
                                 {/* Card 1 */}
                                 <div className="p-4 bg-slate-50 dark:bg-eng-blue-950 rounded-xl space-y-4 border border-slate-200 dark:border-slate-800">
                                     <input
                                         type="text"
-                                        defaultValue={siteContent.card_1_title || 'General Rules'}
-                                        onBlur={(e) => handleContentUpdate('card_1_title', e.target.value)}
+                                        value={siteContent.card_1_title || 'General Rules'}
+                                        onChange={(e) => handleContentChange('card_1_title', e.target.value)}
                                         className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 font-bold bg-white dark:bg-eng-blue-900 text-slate-900 dark:text-white"
                                         placeholder="Card 1 Title"
                                     />
                                     <textarea
                                         rows="5"
-                                        defaultValue={siteContent.card_1_list || ''}
-                                        onBlur={(e) => handleContentUpdate('card_1_list', e.target.value)}
-                                        className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-eng-blue-900 text-slate-900 dark:text-white text-sm"
+                                        value={siteContent.card_1_list || ''}
+                                        onChange={(e) => handleContentChange('card_1_list', e.target.value)}
+                                        className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-eng-blue-900 text-slate-900 dark:text-white text-sm font-mono"
                                         placeholder="List items (one per line)"
                                     />
                                 </div>
@@ -231,16 +286,16 @@ const AdminDashboard = () => {
                                 <div className="p-4 bg-slate-50 dark:bg-eng-blue-950 rounded-xl space-y-4 border border-slate-200 dark:border-slate-800">
                                     <input
                                         type="text"
-                                        defaultValue={siteContent.card_2_title || 'Code Principles'}
-                                        onBlur={(e) => handleContentUpdate('card_2_title', e.target.value)}
+                                        value={siteContent.card_2_title || 'Code Principles'}
+                                        onChange={(e) => handleContentChange('card_2_title', e.target.value)}
                                         className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 font-bold bg-white dark:bg-eng-blue-900 text-slate-900 dark:text-white"
                                         placeholder="Card 2 Title"
                                     />
                                     <textarea
                                         rows="5"
-                                        defaultValue={siteContent.card_2_list || ''}
-                                        onBlur={(e) => handleContentUpdate('card_2_list', e.target.value)}
-                                        className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-eng-blue-900 text-slate-900 dark:text-white text-sm"
+                                        value={siteContent.card_2_list || ''}
+                                        onChange={(e) => handleContentChange('card_2_list', e.target.value)}
+                                        className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-eng-blue-900 text-slate-900 dark:text-white text-sm font-mono"
                                         placeholder="List items (one per line)"
                                     />
                                 </div>
@@ -249,20 +304,20 @@ const AdminDashboard = () => {
                                 <div className="p-4 bg-slate-50 dark:bg-eng-blue-950 rounded-xl space-y-4 border border-slate-200 dark:border-slate-800">
                                     <input
                                         type="text"
-                                        defaultValue={siteContent.card_3_title || 'Common Errors'}
-                                        onBlur={(e) => handleContentUpdate('card_3_title', e.target.value)}
+                                        value={siteContent.card_3_title || 'Common Errors'}
+                                        onChange={(e) => handleContentChange('card_3_title', e.target.value)}
                                         className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 font-bold bg-white dark:bg-eng-blue-900 text-slate-900 dark:text-white"
                                         placeholder="Card 3 Title"
                                     />
                                     <textarea
                                         rows="5"
-                                        defaultValue={siteContent.card_3_list || ''}
-                                        onBlur={(e) => handleContentUpdate('card_3_list', e.target.value)}
-                                        className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-eng-blue-900 text-slate-900 dark:text-white text-sm"
+                                        value={siteContent.card_3_list || ''}
+                                        onChange={(e) => handleContentChange('card_3_list', e.target.value)}
+                                        className="w-full p-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-eng-blue-900 text-slate-900 dark:text-white text-sm font-mono"
                                         placeholder="List items (one per line)"
                                     />
                                 </div>
-
+                                <div className="h-12"></div> {/* Spacer */}
                             </div>
                         )}
                     </div>
