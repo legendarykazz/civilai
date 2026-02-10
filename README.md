@@ -13,4 +13,15 @@ The React Compiler is not enabled on this template because of its impact on dev 
 
 ## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+If you are developing# Civil Engineeering AI Application
+
+![Vercel Deployment](https://deploy.workers.cloudflare.com/deploy-status-badge) <!-- Placeholder for status -->
+
+## Overview
+A comprehensive Civil Engineering Calculator and AI Assistant featuring:
+- **Civil Suite**: 5 specialized calculators (Beam, Concrete, Dams, Hydraulics, Roads).
+- **AI Assistant**: "Senior Structural Engineer" persona with context awareness.
+- **Standalone Mode**: Dedicated full-screen calculator interface.
+
+## version
+v2.1 (Civil Suite Enabled), we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
