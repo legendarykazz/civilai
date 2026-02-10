@@ -8,6 +8,7 @@ import BlogPostPage from './pages/BlogPostPage';
 import ForumPage from './pages/ForumPage';
 import ForumPostPage from './pages/ForumPostPage';
 import AdminDashboard from './pages/AdminDashboard';
+import CivilCalculatorPage from './pages/CivilCalculatorPage';
 
 function App() {
   return (
@@ -21,8 +22,10 @@ function App() {
             <Route path="forum" element={<ForumPage />} />
             <Route path="forum/:id" element={<ForumPostPage />} />
             <Route path="admin" element={<AdminDashboard />} />
+            <Route path="admin" element={<AdminDashboard />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
+          <Route path="calculator" element={<CivilCalculatorPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

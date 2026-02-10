@@ -1,11 +1,12 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Home, LayoutDashboard, Calendar, Settings, Bot } from 'lucide-react';
+import { Home, LayoutDashboard, Calendar, Settings, Bot, Calculator } from 'lucide-react';
 
 const Sidebar = () => {
     const navItems = [
         { icon: Home, label: 'Home', path: '/' },
         { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+        { icon: Calculator, label: 'Calculator', path: '/calculator' },
         { icon: Calendar, label: 'Calendar', path: '/calendar' },
     ];
 

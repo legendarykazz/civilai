@@ -43,6 +43,14 @@ const Navbar = () => {
                         >
                             {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
                         </button>
+
+                        <NavLink
+                            to="/calculator"
+                            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white rounded-full font-medium transition-all shadow-lg shadow-cyan-500/20"
+                        >
+                            <Bot size={18} />
+                            <span>Civil Suite</span>
+                        </NavLink>
                     </div>
 
                     {/* Mobile Menu Button */}
@@ -61,14 +69,17 @@ const Navbar = () => {
             </div>
 
             {/* Mobile Menu */}
-            {isOpen && (
-                <div className="md:hidden bg-white dark:bg-eng-blue-900 border-b border-slate-200 dark:border-slate-800 p-4 space-y-4">
-                    <NavLink to="/" className="block py-2 text-slate-700 dark:text-slate-200">Home</NavLink>
-                    <NavLink to="/blog" className="block py-2 text-slate-700 dark:text-slate-200">Blog</NavLink>
-                    <NavLink to="/forum" className="block py-2 text-slate-700 dark:text-slate-200">Forum</NavLink>
-                </div>
-            )}
-        </nav>
+            {
+                isOpen && (
+                    <div className="md:hidden bg-white dark:bg-eng-blue-900 border-b border-slate-200 dark:border-slate-800 p-4 space-y-4">
+                        <NavLink to="/" className="block py-2 text-slate-700 dark:text-slate-200">Home</NavLink>
+                        <NavLink to="/blog" className="block py-2 text-slate-700 dark:text-slate-200">Blog</NavLink>
+                        <NavLink to="/forum" className="block py-2 text-slate-700 dark:text-slate-200">Forum</NavLink>
+                        <NavLink to="/calculator" className="block py-2 text-cyan-600 dark:text-cyan-400 font-medium">Civil Suite</NavLink>
+                    </div>
+                )
+            }
+        </nav >
     );
 };
 

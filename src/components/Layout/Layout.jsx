@@ -1,10 +1,13 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Navbar from './Navbar';
 import FloatingChat from '../Chat/FloatingChat';
 import { ThemeProvider } from '../../context/ThemeContext';
 
 const Layout = () => {
+    const location = useLocation();
+    const isCalculatorPage = location.pathname.startsWith('/calculator');
+
     return (
         <ThemeProvider>
             <div className="min-h-screen font-sans transition-colors duration-300 selection:bg-cyan-accent selection:text-eng-blue-900">
@@ -12,7 +15,7 @@ const Layout = () => {
                 <main className="relative z-10">
                     <Outlet />
                 </main>
-                <FloatingChat />
+                {!isCalculatorPage && <FloatingChat />}
 
                 {/* Global Ambient Glow for Dark Mode */}
                 <div className="fixed inset-0 pointer-events-none z-0 opacity-0 dark:opacity-100 transition-opacity duration-1000">
