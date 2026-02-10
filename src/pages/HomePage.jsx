@@ -257,6 +257,7 @@ const HomePage = () => {
                         <p className="text-sm text-slate-600 dark:text-slate-500 italic">
                             Engineering is not about guessing — it is about disciplined assumptions, verified calculations, and safe judgment.
                         </p>
+                        <p className="text-xs text-slate-400 mt-4">v2.1 (Civil Suite Enabled)</p>
                     </div>
                 </div>
             </div>
