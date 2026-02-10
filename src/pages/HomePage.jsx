@@ -79,10 +79,17 @@ const HomePage = () => {
                         {content.home_hero_subtitle}
                     </p>
 
-                    <div className="flex items-center justify-center gap-6 animate-in slide-in-from-bottom-5 fade-in duration-1000 delay-300">
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-6 animate-in slide-in-from-bottom-5 fade-in duration-1000 delay-300">
+                        <Link
+                            to="/calculator"
+                            className="w-full sm:w-auto rounded-full bg-gradient-to-r from-cyan-500 to-eng-blue-600 hover:from-cyan-400 hover:to-eng-blue-500 text-white px-8 py-4 text-lg font-bold shadow-xl shadow-cyan-500/30 hover:shadow-cyan-accent/40 hover:-translate-y-1 transition-all flex items-center justify-center gap-2"
+                        >
+                            <Bot size={24} />
+                            Launch Civil Suite
+                        </Link>
                         <button
                             onClick={() => document.querySelector('#chat-trigger')?.click()}
-                            className="rounded-full bg-eng-blue-600 hover:bg-eng-blue-500 text-white px-8 py-4 text-base font-semibold shadow-xl shadow-eng-blue-600/30 hover:shadow-cyan-accent/20 hover:-translate-y-1 transition-all"
+                            className="w-full sm:w-auto rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-slate-900 dark:text-white px-8 py-4 text-base font-semibold backdrop-blur-sm transition-all"
                         >
                             Ask AI Assistant
                         </button>
