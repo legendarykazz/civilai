@@ -6,14 +6,12 @@ import Dams from '../components/CivilCalculator/calculators/Dams';
 import Hydraulics from '../components/CivilCalculator/calculators/Hydraulics';
 import Roads from '../components/CivilCalculator/calculators/Roads';
 import ChatInterface from '../components/CivilCalculator/AI/ChatInterface';
-import SettingsModal from '../components/CivilCalculator/AI/SettingsModal';
-import { Settings, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const CalculatorContent = () => {
     const [activeCalculator, setActiveCalculator] = useState('beam');
     const [contextData, setContextData] = useState(null);
-    const [showSettings, setShowSettings] = useState(false);
 
     const handleCalculatorResult = (data) => {
         setContextData({
@@ -46,12 +44,6 @@ const CalculatorContent = () => {
                         <p className="text-[var(--text-secondary, #64748b)]">Nigerian Standards (BS 8110 / BS 6399)</p>
                     </div>
                 </div>
-                <button
-                    onClick={() => setShowSettings(true)}
-                    className="p-2 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:bg-[var(--bg-tertiary)] transition-colors"
-                >
-                    <Settings className="w-6 h-6 text-[var(--text-primary)]" />
-                </button>
             </div>
 
             <div className="flex flex-col lg:flex-row gap-8">
@@ -84,7 +76,6 @@ const CalculatorContent = () => {
             </div>
 
             <ChatInterface contextData={contextData} />
-            {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
         </div>
     );
 };
