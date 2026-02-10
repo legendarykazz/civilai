@@ -55,6 +55,12 @@ const Navbar = () => {
 
                     {/* Mobile Menu Button */}
                     <div className="flex items-center md:hidden gap-4">
+                        <NavLink
+                            to="/calculator"
+                            className="p-2 text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-900/20 rounded-full"
+                        >
+                            <Bot size={20} />
+                        </NavLink>
                         <button
                             onClick={toggleTheme}
                             className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-500 dark:text-cyan-accent"
